@@ -29,6 +29,7 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 
 versions=( "$@" )
 if [ ${#versions[@]} -eq 0 ]; then
+  # If versions are not given, find available versions via directory listing
 	versions=( */ )
 fi
 versions=( "${versions[@]%/}" )
@@ -66,6 +67,7 @@ is_good_version() {
 }
 
 for version in "${versions[@]}"; do
+  # Strip -rc suffix from version
 	rcVersion="${version%-rc}"
 	rcGrepV='-v'
 	if [ "$rcVersion" != "$version" ]; then
@@ -134,7 +136,7 @@ for version in "${versions[@]}"; do
 	for v in \
 		alpine{3.14,3.13} \
 		{stretch,buster}{/slim,} \
-		windows/windowsservercore-{1809,ltsc2016} \
+		{bionic,focal} \
 	; do
 		dir="$version/$v"
 		variant="$(basename "$v")"
@@ -143,7 +145,6 @@ for version in "${versions[@]}"; do
 
 		case "$variant" in
 			slim) template="$variant"; tag="$(basename "$(dirname "$dir")")" ;;
-			windowsservercore-*) template='windowsservercore'; tag="${variant#*-}" ;;
 			alpine*) template='alpine'; tag="${variant#alpine}" ;;
 			*) template='debian'; tag="$variant" ;;
 		esac
